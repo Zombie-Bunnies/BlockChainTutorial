@@ -26,9 +26,9 @@ namespace BlockChainConsoleApp
 
         }
 
-        public Block()
-        {
-        }
+        //public Block()
+        //{
+        //}
 
         public string CalculateHash()
         {
