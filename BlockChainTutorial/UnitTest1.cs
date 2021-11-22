@@ -10,18 +10,7 @@ namespace BlockChainTutorial
     public class UnitTest1
     {
         readonly Block block = new Block();
-        //private DateTime timeStamp;
-        //private readonly string previousHash;
-
-        [TestMethod]
-        public void ShouldCreateBlockChainClass()
-        {
-            Block block = new Block();
-
-            //Assert
-            Assert.IsNotNull(block);
-
-        }
+        readonly BlockChain blockChain = new BlockChain();
 
         [TestMethod]
         public void ShouldCreateBlockClass()
@@ -33,8 +22,14 @@ namespace BlockChainTutorial
             block.Data = "def";
 
             //Assert
-
+            Assert.IsNotNull(block);
 
         }
+
+        //[TestMethod]
+        //public void ShouldCreateBlockChainClass()
+        //{
+
+        //}
     }
 }

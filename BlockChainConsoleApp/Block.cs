@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,5 +14,30 @@ namespace BlockChainConsoleApp
         public string PreviousHash { get; set; }
         public string Hash { get; set; }
         public string Data { get; set; }
+
+        public Block(DateTime timeStamp, string previousHash, string data)
+        {
+            Index = 0;
+            TimeStamp = timeStamp;
+            PreviousHash = previousHash;
+            Data = data;
+
+            Hash = CalculateHash();
+
+        }
+
+        public Block()
+        {
+        }
+
+        public string CalculateHash()
+        {
+            SHA256 sha256 = SHA256.Create();
+
+            byte[] inputBytes = Encoding.ASCII.GetBytes($"{TimeStamp}-{PreviousHash ?? ""}-{Data}");
+            byte[] outputBytes = sha256.ComputeHash(inputBytes);
+
+            return Convert.ToBase64String(outputBytes);
+        }
     }
 }
