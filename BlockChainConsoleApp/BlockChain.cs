@@ -9,7 +9,10 @@ namespace BlockChainConsoleApp
     public class BlockChain
     {
         public IList<Block> Chain { get; set; }
-        public int Difficulty { get; set; } = 3;
+        public int Difficulty { get; set; } = 2;
+        public int Reward = 1; // cryptocurrency
+
+        IList<Transaction>PendingTransactions = new List<Transaction>();
 
         public BlockChain()
         {
@@ -20,7 +23,11 @@ namespace BlockChainConsoleApp
 
         public Block CreateGenesisBlock()
         {
-            return new Block(DateTime.Now, null, "{}");
+            Block block = new Block(DateTime.Now, null, PendingTransactions);
+            block.Mine(Difficulty);
+            PendingTransactions = new List<Transaction>();
+            return block;
+            //return new Block(DateTime.Now, null, PendingTransactions);
         }
 
         public void AddGenesisBlock()
@@ -43,7 +50,7 @@ namespace BlockChainConsoleApp
             Block latestBlock = GetLatestBlock();
             block.Index = latestBlock.Index + 1;
             block.PreviousHash = latestBlock.Hash;
-            block.Hash = block.CalculateHash();
+            //block.Hash = block.CalculateHash();
             block.Mine(this.Difficulty);
             Chain.Add(block);
         }
@@ -66,6 +73,45 @@ namespace BlockChainConsoleApp
                 }
             }
             return true;
+        }
+
+        public void CreateTransaction(Transaction transaction)
+        {
+            PendingTransactions.Add(transaction);
+        }
+
+        public void ProcessPendingTransactions(string minerAddress)
+        {
+            Block block = new Block(DateTime.Now, GetLatestBlock().Hash, PendingTransactions);
+            AddBlock(block);
+
+            PendingTransactions = new List<Transaction>();
+            CreateTransaction(new Transaction(null, minerAddress, Reward));
+        }
+
+        public int GetBalance(string address)
+        {
+            int balance = 0;
+
+            for (int i = 0; i < Chain.Count; i++)
+            {
+                for (int j = 0; j < Chain[i].Transactions.Count; j++)
+                {
+                    var transaction = Chain[i].Transactions[j];
+
+                    if (transaction.FromAddress == address)
+                    {
+                        balance -= transaction.Amount;
+                    }
+
+                    if (transaction.ToAddress == address)
+                    {
+                        balance += transaction.Amount;
+                    }
+                }
+            }
+
+            return balance;
         }
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using BlockChainConsoleApp;
 using System.Security.Policy;
+using System.Collections.Generic;
 
 namespace BlockChainTutorial
 {
@@ -9,19 +10,17 @@ namespace BlockChainTutorial
     [TestClass]
     public class UnitTest1
     {
-        readonly Block block = new Block(DateTime.Now, null, "");
+        IList<Transaction> PendingTransactions = new List<Transaction>();
+        public int Difficulty { get; set; } = 2;
         readonly BlockChain blockChain = new BlockChain();
-
-        //public BlockChain BlockChain => blockChain;
 
         [TestMethod]
         public void ShouldCreateBlockClass()
         {
-            block.Index = 1;
-            block.TimeStamp = DateTime.Now;
-            block.PreviousHash = "previousHash";
-            block.Hash = "abc";
-            block.Data = "def";
+            Block block = new Block(DateTime.Now, null, transactions: PendingTransactions);
+
+            block.Mine(Difficulty);
+            PendingTransactions = new List<Transaction>();
 
             //Assert
             Assert.IsNotNull(block);
@@ -31,9 +30,8 @@ namespace BlockChainTutorial
         [TestMethod]
         public void ShouldCreateBlockChainClass()
         {
-            //block.Index = 2;
-            //blockChain.InitializeChain();
-            blockChain.AddBlock(block);
+            BlockChain blockChain = new BlockChain();
+            //Assert
             Assert.IsNotNull(blockChain);
         }
 
@@ -41,9 +39,7 @@ namespace BlockChainTutorial
         public void ShouldCreateShortBlockChain()
         {
             BlockChain phillyCoin = new BlockChain();
-            phillyCoin.AddBlock(new Block(DateTime.Now, null, "{sender:Henry,receiver:MaHesh,amount:10}"));
-            phillyCoin.AddBlock(new Block(DateTime.Now, null, "{sender:MaHesh,receiver:Henry,amount:5}}"));
-            phillyCoin.AddBlock(new Block(DateTime.Now, null, "{sender:Mahesh,receiver:Henry,amount:5}"));
+            phillyCoin.CreateTransaction(new Transaction("Mahesh", "Henry", 10));
 
             //Assert
             Assert.IsNotNull(phillyCoin);
@@ -53,9 +49,9 @@ namespace BlockChainTutorial
         public void LatestHashAndPreviousHashShouldBeEqual()
         {
             BlockChain phillyCoin = new BlockChain();
-            phillyCoin.AddBlock(new Block(DateTime.Now, null, "{sender:Henry,receiver:MaHesh,amount:10}"));
-            phillyCoin.AddBlock(new Block(DateTime.Now, null, "{sender:MaHesh,receiver:Henry,amount:5}}"));
-            phillyCoin.AddBlock(new Block(DateTime.Now, null, "{sender:Mahesh,receiver:Henry,amount:5}"));
+            phillyCoin.CreateTransaction(new Transaction("Mahesh", "Henry", 10));
+            phillyCoin.CreateTransaction(new Transaction("MaHesh", "Henry", 5));
+            phillyCoin.ProcessPendingTransactions("Bill");
 
             string genesisHashCode = phillyCoin.Chain[0].Hash;
             string nextHashCode = phillyCoin.Chain[1].PreviousHash;
