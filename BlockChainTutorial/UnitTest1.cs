@@ -12,7 +12,6 @@ namespace BlockChainTutorial
     {
         IList<Transaction> PendingTransactions = new List<Transaction>();
         public int Difficulty { get; set; } = 2;
-        readonly BlockChain blockChain = new BlockChain();
 
         [TestMethod]
         public void ShouldCreateBlockClass()
