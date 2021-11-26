@@ -173,5 +173,45 @@ namespace BlockChainTutorial
 
             Assert.IsFalse(check_ABC_PlusNonce_For_leadingZeros);
         }
+
+        [TestMethod]
+        public void ShouldCountNumberOfNonceForHash()
+        {
+            int nonce = 0;
+            int difficulty = 3;
+            var leadingZeros = new string('0', difficulty);
+            int numberOfNonceToCheck = 10000000;
+            bool checkABC_For_LeadingZeros = false;
+            int numberOfFoundNonce = 0;
+            IList<int> listOfNonce = new List<int>();
+
+            SHA256 sha256 = SHA256.Create();
+
+            byte[] inputBytes_ABC = Encoding.ASCII.GetBytes("ABC");
+            byte[] inputBytes_ABC_Plus_Nonce = Encoding.ASCII.GetBytes($"{inputBytes_ABC}-{nonce}");
+            byte[] outputBytes_ABC_Plus_Nonce = sha256.ComputeHash(inputBytes_ABC_Plus_Nonce);
+
+            string ABC_PlusNonce = Convert.ToBase64String(outputBytes_ABC_Plus_Nonce);
+
+            var startTime = DateTime.Now;
+
+            for (int i = 0; i < numberOfNonceToCheck; i++)
+            {
+                inputBytes_ABC_Plus_Nonce = Encoding.ASCII.GetBytes($"{inputBytes_ABC}-{nonce}");
+                outputBytes_ABC_Plus_Nonce = sha256.ComputeHash(inputBytes_ABC_Plus_Nonce);
+                ABC_PlusNonce = Convert.ToBase64String(outputBytes_ABC_Plus_Nonce);
+
+                checkABC_For_LeadingZeros = ABC_PlusNonce.StartsWith(leadingZeros);
+
+                if (checkABC_For_LeadingZeros)
+                {
+                    listOfNonce.Add(nonce);
+                }
+                nonce++;
+            }
+
+            Assert.AreEqual(numberOfFoundNonce, listOfNonce.Count);
+
+        }
     }
 }
